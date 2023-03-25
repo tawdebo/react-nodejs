@@ -34,7 +34,7 @@ jobs:
                npm install -g pm2
                cd /home/ubuntu
                git clone https://github.com/tawdebo/react-nodejs.git
-               cd /home/ubuntu/react-nodejs
+               cd /home/ubuntu/react-nodejs/my-app
                npm install
                npm run build
                pm2 delete all
