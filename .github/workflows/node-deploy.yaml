@@ -1,0 +1,41 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+# ssh deploy
+name: Node.js CI
+
+on:
+  push:
+    branches: [ main ]
+
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+     - name: SSH deploy
+       uses: appleboy/ssh-action@master
+       with:
+          host: ${{ secrets.SSH_IP }}
+          username:  ${{ secrets.SSH_USERNAME }}
+          key:  ${{ secrets.SSH_KEY }}
+          script: |
+               apt-get update
+               cd ~
+               curl -sL https://deb.nodesource.com/setup_16.x -o /tmp/nodesource_setup.sh
+               sudo bash /tmp/nodesource_setup.sh
+               sudo apt install nodejs
+               node -v
+               npm install -g pm2
+               cd /home/ubuntu
+               git clone https://github.com/tawdebo/react-nodejs.git
+               cd /home/ubuntu/react-nodejs
+               npm install
+               npm run build
+               pm2 delete all
+               pm2 start npm -- start
